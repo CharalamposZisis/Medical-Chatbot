@@ -23,6 +23,8 @@ os.environ['OPENAI_API_KEY'] = OPENAI_API_KEY
 
 
 embeddings = download_embeddings()
+
+# create an index in the pinecone
 index_name = 'medical-chatbot'
 
 docsearch = PineconeVectorStore.from_existing_index(
