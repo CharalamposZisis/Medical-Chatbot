@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical AI Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            /* Το βαθύ μπλε/γκρι background της φωτογραφίας */
+            background-color: #1a1c23;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Η κεντρική κάρτα του Chat */
+        .chat-card {
+            background-color: #242731;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Message Bubbles */
+        .user-bubble {
+            background-color: #59d36e; /* Το χαρακτηριστικό πράσινο */
+            color: #000;
+            border-radius: 15px 15px 0 15px;
+            font-weight: 500;
+        }
+
+        .bot-bubble {
+            background-color: #323644;
+            color: #fff;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Custom Scrollbar */
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-thumb { background: #3f4453; border-radius: 10px; }
+
+        /* Input Area */
+        .input-box {
+            background-color: #1a1c23;
+            border: none;
+            color: white;
+        }
+
+        .avatar-container {
+            position: relative;
+        }
+        .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #59d36e;
+            border: 2px solid #242731;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="h-screen flex items-center justify-center p-4">
+
+    <div class="chat-card">
+        <header class="p-6 border-b border-gray-700 flex items-center gap-4">
+            <div class="avatar-container">
+                <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" class="w-12 h-12 rounded-full border-2 border-yellow-400 p-0.5" alt="Doctor">
+                <div class="online-dot"></div>
+            </div>
+            <div>
+                <h1 class="text-white font-bold text-lg leading-none">Medical Chatbot</h1>
+                <p class="text-gray-400 text-xs mt-1">Ask me anything!</p>
+            </div>
+        </header>
+
+        <main id="chat-window" class="messages-area flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="flex justify-start gap-3">
+                <div class="bot-bubble p-4 max-w-[75%] text-sm">
+                    Hello! How can I help you with your health concerns today?
+                </div>
+            </div>
+        </main>
+
+        <footer class="p-6">
+            <div class="relative flex items-center">
+                <input type="text" id="user-input" 
+                    class="input-box w-full rounded-xl pl-6 pr-14 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+                    placeholder="Type your message...">
+                
+                <button id="send-btn" class="absolute right-4 text-white hover:text-green-400 transition-colors">
+                    <i class="fas fa-paper-plane text-xl"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        function appendMessage(role, text) {
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex ${role === 'user' ? 'justify-end items-start gap-3' : 'justify-start items-start gap-3'}`;
+            
+            let content = '';
+            if (role === 'user') {
+                content = `
+                    <div class="flex flex-col items-end">
+                        <div class="user-bubble p-3 text-sm">${text}</div>
+                        <span class="timestamp">${time}</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center border border-blue-400">
+                        <i class="fas fa-user text-xs text-blue-200"></i>
+                    </div>
+                `;
+            } else {
+                content = `
+                    <div class="w-8 h-8 rounded-full overflow-hidden">
+                        <img src="https://cdn-icons-png.flaticon.com/512/387/387561.png" alt="Bot">
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="bot-bubble p-3 text-sm">${text}</div>
+                        <span class="timestamp">${time}</span>
+                    </div>
+                `;
+            }
+            
+            wrapper.innerHTML = content;
+            chatWindow.appendChild(wrapper);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        async function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            userInput.value = '';
+
+            try {
+                const response = await fetch('/get', {
+                    method: 'POST',
+                    body: new URLSearchParams({'msg': text})
+                });
+                const data = await response.text();
+                appendMessage('ai', data);
+            } catch (e) {
+                appendMessage('ai', "Error: Connection lost.");
+            }
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
+    </script>
+</body>
+</html>
