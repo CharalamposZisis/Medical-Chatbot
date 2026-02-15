@@ -1,6 +1,6 @@
 # Medical-Chatbot
 
-On that project it was my first trial to make Medical Chatbot using langachain and ChatOpenAI.
+On that project it was my first trial to make Medical Chatbot using langachain and ChatOpenAI. \n
 I used The Gale Encyclopedia of Medicine as the primary data source. To ensure the chatbot provided accurate information,
 I implemented a preprocessing pipeline before storing the data in Pinecone:
     - Data Extraction: Extracted the raw text content from the encyclopedia.
@@ -10,7 +10,7 @@ I implemented a preprocessing pipeline before storing the data in Pinecone:
     a pre-trained model from Hugging Face.
     - Vector Storage: Indexed the embeddings in Pinecone for efficient similarity searches.
     - Query Logic: Integrated the system with OpenAI's models to generate concise, context-aware medical answers.":
-    
+
     - I gave the system prompt which was - > 
     system_prompt = (
     'You are an Medical assistant for question-answering tasks.'
