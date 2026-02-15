@@ -5,9 +5,7 @@ On that project it was my first trial to make Medical Chatbot using langachain a
 I used The Gale Encyclopedia of Medicine as the primary data source. To ensure the chatbot provided accurate information,<br>
 
 I implemented a preprocessing pipeline before storing the data in Pinecone:<br>
-
     - Data Extraction: Extracted the raw text content from the encyclopedia.<br>
-
     - Text Splitting: Segmented the text into chunks of 500 characters with a <br>
         20-character overlap to maintain contextual continuity.<br>
     - Embedding Generation: Transformed these chunks into vector embeddings using <br>
